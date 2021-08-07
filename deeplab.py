@@ -1,3 +1,4 @@
+##Import Packages
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
@@ -6,7 +7,7 @@ from tensorflow.keras.layers import MaxPool2D, add, SeparableConv2D
 from tensorflow.keras.applications.xception import Xception
 import numpy as np
 
-
+##Upsample
 def Upsample(tensor, size):
     '''bilinear upsampling'''
     name = tensor.name.split('/')[0] + '_upsample'
@@ -19,6 +20,7 @@ def Upsample(tensor, size):
                output_shape=size, name=name)(tensor)
     return y
 
+##Modifed ASPP
 def ASPP(tensor):
     '''atrous spatial pyramid pooling'''
     dims = K.int_shape(tensor)
@@ -60,7 +62,7 @@ def ASPP(tensor):
     y = Activation('relu', name=f'relu_final')(y)
     return y
 
-
+##Encoder-Decoder Architecture
 def DeepLabV3Plus(img_height, img_width, nclasses=26):  
     print('*** Building DeepLabv3Plus Network ***')
     channel_axis=-1
