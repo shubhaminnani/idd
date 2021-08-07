@@ -17,6 +17,12 @@ The performance is evaluated in terms of mean Intersection over Union (mIoU) on 
 ### Challenge Link
 https://idd.insaan.iiit.ac.in/evaluation/icvgip20/
 
+### Train
+Run -> [!train.py]
+
+### Inference
+Run -> [Inference.py]
+
 ## Results 
 ![Images, Mask and Predictions](image.png)
 
