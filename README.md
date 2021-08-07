@@ -1,7 +1,6 @@
 <p align="center">
-  ![semantic segmentation](semantic_segmentation.gif)
+   <img src="[semantic_segmentation.gif]" alt="[semantic segmentation]"/>
 </p>
-
 
 # India Driving Dataset - Semantic Segmantation Challenge
 
