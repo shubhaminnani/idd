@@ -1,46 +1,42 @@
+#Import Packages
 from glob import glob
 import tensorflow as tf
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from deeplab import DeepLabV3Plus
 
-print('TensorFlow', tf.__version__)
 
-batch_size = 6
-H, W = 512, 512
-num_classes = 26
 
-img_height=512
-img_width=512
+batch_size = 6  #Define Batch Size
+H, W = 512, 512 #Crop Size
+num_classes = 26 #labels 
 
-# =============================================================================
-# image_list = sorted(glob('data/train/img/0/*'))
-# mask_list = sorted(glob('data/train/mask/0/*'))
-# 
-# val_image_list = sorted(glob('data/val/img/3/*'))
-# val_mask_list = sorted(glob('data/val/mask/3/*'))
-# =============================================================================
-image_list = sorted(glob('/gdrive/My Drive/Shared with Shubham_Deep Learning/dataset/leftImg8bit/train/*/*'))
-mask_list = sorted(glob('/gdrive/My Drive/Shared with Shubham_Deep Learning/dataset/gtFine_only_level3Id/train/*/*'))
+#Training Images and Mask
+image_list = sorted(glob('dataset/leftImg8bit/train/*/*'))
+mask_list = sorted(glob('dataset/gtFine_only_level3Id/train/*/*'))
 
-val_image_list = sorted(glob('/gdrive/My Drive/Shared with Shubham_Deep Learning/dataset/leftImg8bit/val/*/*'))
-val_mask_list = sorted(glob('/gdrive/My Drive/Shared with Shubham_Deep Learning/dataset/gtFine_only_level3Id/val/**/*'))
+#Validation Images and Mask
+val_image_list = sorted(glob('dataset/leftImg8bit/val/*/*'))
+val_mask_list = sorted(glob('gtFine_only_level3Id/val/**/*'))
 
+#Number of Training and Validation Images
 print('Found', len(image_list), 'training images')
 print('Found', len(val_image_list), 'validation images')
 
+#Checking the Image number with the mask number
 for i in range(len(image_list)):
     assert image_list[i].split('/')[-1].split('_leftImg8bit')[0] == mask_list[i].split('/')[-1].split('_gtFine_labellevel3Ids')[0]
 
 for i in range(len(val_image_list)):
     assert val_image_list[i].split('/')[-1].split('_leftImg8bit')[0] == val_mask_list[i].split('/')[-1].split('_gtFine_labellevel3Ids')[0]
 
-
+#Preprocess (-1,1)
 def preprocess_input(x):
     x /= 255.
     x -= 0.5
     x *= 2.
     return x
 
+#Image and Mask Loader
 def get_image(image_path, img_height=1080, img_width=1920, mask=False, flip=0):
     img = tf.io.read_file(image_path)
     if not mask:
@@ -65,7 +61,7 @@ def get_image(image_path, img_height=1080, img_width=1920, mask=False, flip=0):
         #], default=lambda: img)
     return img
 
-
+#Random Crop 512*512
 def random_crop(image, mask, H=512, W=512):
     image_dims = image.shape
     offset_h = tf.random.uniform(
@@ -85,7 +81,7 @@ def random_crop(image, mask, H=512, W=512):
                                          target_width=W)
     return image, mask
 
-
+#load data 
 def load_data(image_path, mask_path, H=512, W=512):
     flip = tf.random.uniform(
         shape=[1, ], minval=0, maxval=2, dtype=tf.int32)[0]
@@ -94,7 +90,7 @@ def load_data(image_path, mask_path, H=512, W=512):
     image, mask = random_crop(image, mask, H=H, W=W)
     return image, mask
 
-
+#train data loader
 train_dataset = tf.data.Dataset.from_tensor_slices((image_list, mask_list))
 train_dataset = train_dataset.shuffle(buffer_size=128)
 train_dataset = train_dataset.apply(
@@ -106,6 +102,7 @@ train_dataset = train_dataset.repeat()
 train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
 print(train_dataset)
 
+#val data loader
 val_dataset = tf.data.Dataset.from_tensor_slices((val_image_list,
                                                   val_mask_list))
 val_dataset = val_dataset.apply(
@@ -116,7 +113,7 @@ val_dataset = val_dataset.apply(
 val_dataset = val_dataset.repeat()
 val_dataset = val_dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-
+#training strategy
 loss = tf.losses.SparseCategoricalCrossentropy(from_logits=True)
 strategy = tf.distribute.MirroredStrategy()
 with strategy.scope():
@@ -142,6 +139,7 @@ callbacks = [mc, tb]
 
 model.summary()
 
+#Training the Model
 model.fit(train_dataset,
           steps_per_epoch=len(image_list)/batch_size ,
           epochs=40,
