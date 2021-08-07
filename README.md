@@ -1,5 +1,5 @@
 <p align="center">
-  <src='semantic_segmentation.gif'>
+  ![semantic segmentation](semantic_segmentation.gif)
 </p>
 
 
