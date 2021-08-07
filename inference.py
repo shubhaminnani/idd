@@ -1,3 +1,4 @@
+#Import Packages
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,12 +14,12 @@ import pickle
 from tensorflow.keras.utils import multi_gpu_model
 from tensorflow.keras.applications.xception import preprocess_input
 
+#Inference Image Size required for Online Evaluation Server
 h, w = 720,1280
 model = DeepLabV3Plus(h, w, 26)
-#model = Deeplabv3(input_shape=(720, 1280, 3),classes=26, backbone='xception', weights='imagenet',OS=8)
-model.load_weights('top_weights.h5')
+model.load_weights('top_weights.h5') ##Load top result weights
 
-
+#Define the inference pipeline
 def pipeline(image, fname='', folder=''):
     alpha = 0.5
     dims = image.shape
@@ -31,19 +32,13 @@ def pipeline(image, fname='', folder=''):
     y = cv2.resize(y, (dims[1],dims[0]))
     return cv2.imwrite(f'outputs/{folder}/{fname}.png', y)
 
-#image_dir = 'test'
-#image_list = os.listdir(image_dir)
-#image_list.sort()
-#print(f'{len(image_list)} frames found')
+image_dir = 'dataset/test'
+image_list = os.listdir(image_dir)
+image_list.sort()
+print(f'{len(image_list)} frames found')
 
-# =============================================================================
-# 
-# test = load_img(f'{image_dir}/{image_list[1]}')
-# test = img_to_array(test)
-# pipeline(test)
-# =============================================================================
 
-for image_dir in ['/test/4']:
+for image_dir in image_list:
     os.mkdir(f'outputs/{image_dir}')
     image_list = os.listdir(image_dir)
     image_list.sort()
