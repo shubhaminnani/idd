@@ -19,6 +19,6 @@ https://idd.insaan.iiit.ac.in/evaluation/icvgip20/
 ![Images, Mask and Predictions](image.png)
 
 
-##Citation
+## Citation
 [1] Bhakti Baheti, Shubham Innani, Suhas Gajre, Sanjay Talbar, Semantic scene segmentation in unstructured environment with modified DeepLabV3+, Pattern Recognition Letters,
 Volume 138, 2020, Pages 223-229, ISSN 0167-8655, https://doi.org/10.1016/j.patrec.2020.07.029. (https://www.sciencedirect.com/science/article/pii/S0167865520302750)
